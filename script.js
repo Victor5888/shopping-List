@@ -4,10 +4,13 @@ const formItems = document.getElementById('item-form');
 const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
 const addButton = document.querySelector('.btn');
+const clearBtn = document.getElementById('clear');
+
+const itemsFilter = document.getElementById('filter');
 
 //========function for the event listeners=============================
 
-function addItem(e) {
+function onaddItemSubmit(e) {
   e.preventDefault();
   const newItem = itemInput.value;
 
@@ -17,7 +20,16 @@ function addItem(e) {
     return;
   }
 
+  checkUI();
+
+  /////clearing the form
+  itemInput.value = '';
+}
+
+//==================this is function for adding items to the Dom=========================
+function addItemToDOM(item) {
   //================================creating the list item =====================================
+
   const li = document.createElement('li');
   const newText = document.createTextNode(newItem);
 
@@ -25,9 +37,8 @@ function addItem(e) {
 
   const generatedBtn = createButton('remove-item btn-link text-red');
   li.appendChild(generatedBtn);
+
   itemList.appendChild(li);
-  /////////////clearing the form
-  itemInput.value = '';
 }
 
 ///======================== function for creatin gthe buttons==========================================
@@ -47,5 +58,59 @@ function createIcon(iclasses) {
   return newIcon;
 }
 
+//===============================Function for removing or deleting items====================================================================
+
+function removeItem(e) {
+  if (e.target.parentElement.classList.contains('remove-item')) {
+    if (confirm('are you sure')) {
+      e.target.parentElement.parentElement.remove();
+      checkUI();
+    }
+  }
+}
+
+function clearItems() {
+  while (itemList.firstChild) {
+    itemList.removeChild(itemList.firstChild);
+  }
+  checkUI();
+}
+
+///========================================fuction to check the UI before showing the filter and clearAll buttons=========================
+
+function checkUI() {
+  const items = itemList.querySelectorAll('li');
+  if (items.length === 0) {
+    clearBtn.style.display = 'none';
+    itemsFilter.style.display = 'none';
+  } else {
+    clearBtn.style.display = 'block';
+    itemsFilter.style.display = 'block';
+  }
+}
+
+//===========================fnction for filteritems============================================
+
+function filterItems(e) {
+  const text = e.target.value.toLowerCase();
+  const items = itemList.querySelectorAll('li');
+  items.forEach((item) => {
+    const itemName = item.firstChild.textContent.toLowerCase();
+
+    //==============comparing the 'text' and 'itemName'==================================================
+    if (itemName.indexOf(text) != -1) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
 //=========================== event Listeners ==================================================
-formItems.addEventListener('submit', addItem);
+
+itemList.addEventListener('click', removeItem);
+formItems.addEventListener('submit', onaddItemSubmit);
+clearBtn.addEventListener('click', clearItems);
+itemsFilter.addEventListener('input', filterItems);
+
+checkUI();
