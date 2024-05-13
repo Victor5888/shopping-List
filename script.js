@@ -8,7 +8,13 @@ const clearBtn = document.getElementById('clear');
 
 const itemsFilter = document.getElementById('filter');
 
-//========function for the event listeners=============================
+function displayItems() {
+  const itemsFromStorage = getItemFromStorage();
+  itemsFromStorage.forEach((item) => {
+    addItemToDOM(item);
+  });
+  checkUI();
+}
 
 function onaddItemSubmit(e) {
   e.preventDefault();
@@ -20,6 +26,10 @@ function onaddItemSubmit(e) {
     return;
   }
 
+  //calling the functions to add items to storage and DOM
+  addItemToDOM(newItem);
+  addItemToStorage(newItem);
+
   checkUI();
 
   /////clearing the form
@@ -28,10 +38,10 @@ function onaddItemSubmit(e) {
 
 //==================this is function for adding items to the Dom=========================
 function addItemToDOM(item) {
-  //================================creating the list item =====================================
+  //=============creating the list item =====================================
 
   const li = document.createElement('li');
-  const newText = document.createTextNode(newItem);
+  const newText = document.createTextNode(item);
 
   li.appendChild(newText);
 
@@ -39,6 +49,27 @@ function addItemToDOM(item) {
   li.appendChild(generatedBtn);
 
   itemList.appendChild(li);
+}
+
+function addItemToStorage(item) {
+  const itemsFromStorage = getItemFromStorage();
+
+  itemsFromStorage.push(item);
+
+  //convert to JSON string
+
+  localStorage.setItem('items', JSON.stringify(itemsFromStorage));
+}
+
+function getItemFromStorage() {
+  let itemsFromStorage;
+  if (localStorage.getItem('items') === null) {
+    itemsFromStorage = [];
+  } else {
+    itemsFromStorage = JSON.parse(localStorage.getItem('items'));
+  }
+
+  return itemsFromStorage;
 }
 
 ///======================== function for creatin gthe buttons==========================================
@@ -112,5 +143,6 @@ itemList.addEventListener('click', removeItem);
 formItems.addEventListener('submit', onaddItemSubmit);
 clearBtn.addEventListener('click', clearItems);
 itemsFilter.addEventListener('input', filterItems);
+document.addEventListener('DOMContentLoaded', displayItems);
 
 checkUI();
