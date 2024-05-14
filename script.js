@@ -88,22 +88,42 @@ function createIcon(iclasses) {
   newIcon.className = iclasses;
   return newIcon;
 }
+function onClickItem(e) {
+  if (e.target.parentElement.classList.contains('remove-item')) {
+    removeItem(e.target.parentElement.parentElement);
+  }
+}
 
 //===============================Function for removing or deleting items====================================================================
 
-function removeItem(e) {
-  if (e.target.parentElement.classList.contains('remove-item')) {
-    if (confirm('are you sure')) {
-      e.target.parentElement.parentElement.remove();
-      checkUI();
-    }
+function removeItem(item) {
+  if (confirm('are you sure you want to delete permanently ?')) {
+    // remove items from DOM
+    item.remove();
+
+    // remove items from storage
+    removeItemFromStorage(item.textContent);
+    checkUI();
   }
+}
+
+function removeItemFromStorage(item) {
+  let itemsFromStorage = getItemFromStorage();
+
+  //============================filter out items to be removed========================
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+  /////////////// we need to set it again to local storage ==================================
+  localStorage.setItem('items', JSON.stringify(itemsFromStorage));
 }
 
 function clearItems() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+
+  ///=========clearing from local storage============
+  localStorage.removeItem('items');
   checkUI();
 }
 
@@ -139,7 +159,7 @@ function filterItems(e) {
 
 //=========================== event Listeners ==================================================
 
-itemList.addEventListener('click', removeItem);
+itemList.addEventListener('click', onClickItem);
 formItems.addEventListener('submit', onaddItemSubmit);
 clearBtn.addEventListener('click', clearItems);
 itemsFilter.addEventListener('input', filterItems);
