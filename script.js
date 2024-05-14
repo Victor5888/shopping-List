@@ -5,6 +5,8 @@ const itemInput = document.getElementById('item-input');
 const itemList = document.getElementById('item-list');
 const addButton = document.querySelector('.btn');
 const clearBtn = document.getElementById('clear');
+const formBtn = formItems.querySelector('button');
+let isEditMode = false;
 
 const itemsFilter = document.getElementById('filter');
 
@@ -26,7 +28,15 @@ function onaddItemSubmit(e) {
     return;
   }
 
-  //calling the functions to add items to storage and DOM
+  //============================check for edit mode
+  if (isEditMode) {
+    const itemToEdit = itemList.querySelector('.edit-mode');
+    removeItemFromStorage(itemToEdit.textContent);
+    itemToEdit.classList.remove('edit-mode');
+    itemToEdit.remove();
+    isEditMode = false;
+  }
+  //============================calling the functions to add items to storage and DOM
   addItemToDOM(newItem);
   addItemToStorage(newItem);
 
@@ -91,7 +101,23 @@ function createIcon(iclasses) {
 function onClickItem(e) {
   if (e.target.parentElement.classList.contains('remove-item')) {
     removeItem(e.target.parentElement.parentElement);
+  } else {
+    setItemToEdit(e.target);
   }
+}
+
+//============================fuction for editing the items ==============
+
+function setItemToEdit(item) {
+  isEditMode = true;
+  itemList.querySelectorAll('li').forEach((i) => {
+    i.style.color = '';
+  });
+  item.classList.add('edit-mode');
+  formBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update Item';
+  formBtn.style.backgroundColor = '#228B22';
+
+  itemInput.value = item.textContent;
 }
 
 //===============================Function for removing or deleting items====================================================================
@@ -130,6 +156,7 @@ function clearItems() {
 ///========================================fuction to check the UI before showing the filter and clearAll buttons=========================
 
 function checkUI() {
+  itemInput.value = '';
   const items = itemList.querySelectorAll('li');
   if (items.length === 0) {
     clearBtn.style.display = 'none';
@@ -138,6 +165,11 @@ function checkUI() {
     clearBtn.style.display = 'block';
     itemsFilter.style.display = 'block';
   }
+
+  formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item';
+  formBtn.style.backgroundColor = '#333';
+
+  isEditMode = false;
 }
 
 //===========================fnction for filteritems============================================
